@@ -9,7 +9,7 @@ type Message = {
   content: string;
 };
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "";
 
 function App() {
   const [models, setModels] = useState<Model[]>([]);
@@ -24,31 +24,36 @@ function App() {
 
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  async function loadModels() {
+  try {
+    console.log("FETCH:", `${API_URL}/api/models`);
+
+    const response = await fetch(`${API_URL}/api/models`);
+
+    console.log("STATUS:", response.status);
+    console.log("OK:", response.ok);
+
+    const data = await response.json();
+
+    console.log("DATA:", data);
+
+    setModels(data.models);
+    setLmStudioAvailable(data.lm_studio_available);
+
+    if (data.models.length > 0) {
+      setSelectedModel(data.models[0].id);
+    }
+  } catch (error) {
+    console.error("ERROR:", error);
+
+    setLmStudioAvailable(false);
+    setModels([]);
+  }
+}
+
   useEffect(() => {
     loadModels();
   }, []);
-
-  async function loadModels() {
-    try {
-      const response = await fetch(`${API_URL}/api/models`);
-
-      if (!response.ok) {
-        throw new Error("Backend returned an error");
-      }
-
-      const data = await response.json();
-
-      setModels(data.models);
-      setLmStudioAvailable(data.lm_studio_available);
-
-      if (data.models.length > 0) {
-        setSelectedModel(data.models[0].id);
-      }
-    } catch {
-      setLmStudioAvailable(false);
-      setModels([]);
-    }
-  }
 
   async function sendMessage() {
     const text = input.trim();
