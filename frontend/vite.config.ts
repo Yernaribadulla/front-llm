@@ -5,11 +5,15 @@ export default defineConfig({
   plugins: [react()],
 
   server: {
+    allowedHosts: [
+      "landslide-tamale-boring.ngrok-free.dev",
+    ],
+
     proxy: {
       "/api": {
-        target: "https://landslide-tamale-boring.ngrok-free.dev",
+        target: "http://127.0.0.1:8000",
         changeOrigin: true,
-        secure: true,
+        secure: false,
       },
     },
   },
